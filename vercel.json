@@ -3,5 +3,9 @@
     "api/chat.js": {
       "maxDuration": 30
     }
-  }
+  },
+  "routes": [
+    { "src": "/api/chat", "dest": "/api/chat.js" },
+    { "src": "/(.*)", "dest": "/pawsense.html" }
+  ]
 }
