@@ -5,26 +5,19 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    const { messages, max_tokens, model } = req.body;
+    const { messages, max_tokens } = req.body;
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: model || 'claude-opus-4-6',
-        max_tokens: max_tokens || 1000,
-        messages: messages,
-      }),
-    });
+    const contents = messages.map(msg => {
+      const parts = [];
+      const content = msg.content;
 
-    const data = await response.json();
-    res.status(200).json(data);
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
+      if (typeof content === 'string') {
+        parts.push({ text: content });
+      } else if (Array.isArray(content)) {
+        for (const block of content) {
+          if (block.type === 'text') {
+            parts.push({ text: block.text });
+          } else if (block.type === 'image') {
+            parts.push({
+              inline_data: {
+                mime_type: block.so
